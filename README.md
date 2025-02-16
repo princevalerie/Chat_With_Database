@@ -45,7 +45,7 @@ Aplikasi ini memungkinkan pengguna untuk berinteraksi dengan berbagai jenis data
 
 1. **Menyiapkan Kredensial API Groq**:
 
-   - Dapatkan kunci API Anda dari [Groq](https://groq.com/).
+   - Dapatkan kunci API Anda dari [Groq](https://console.groq.com/keys).
    - Simpan kunci API tersebut di tempat yang aman.
 
 2. **Konfigurasi Database**:
