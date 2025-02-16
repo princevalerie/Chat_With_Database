@@ -230,7 +230,7 @@ for msg in st.session_state.messages:
 
 # User query input with table restriction notice
 user_query = st.chat_input(
-    placeholder="Ask about the readiness table"
+    placeholder="Ask about your data"
 )
 
 if user_query:
