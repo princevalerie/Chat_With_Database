@@ -1,5 +1,3 @@
-Berikut adalah contoh `README.md` yang dapat Anda tambahkan ke repositori GitHub Anda untuk memudahkan programmer lain memahami dan menggunakan aplikasi Streamlit yang Anda kembangkan:
-
 
 # Chat dengan Database Anda
 
