@@ -8,7 +8,8 @@ from langchain_community.callbacks import StreamlitCallbackHandler
 
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, event
+
 
 import sqlite3
 import psycopg2
@@ -85,13 +86,22 @@ def configure_db(db_uri, pg_host=None, pg_user=None, pg_password=None, pg_db=Non
         return engine
 
     def create_restricted_db(engine):
-        """Create a SQLDatabase instance with restricted table access"""
+
+        """Create a SQLDatabase instance with restricted table access and prevent DELETE/TRUNCATE"""
         inspector = inspect(engine)
         existing_tables = [table for table in tables_to_check if inspector.has_table(table)]
         
         if not existing_tables:
             st.error("❌ None of the specified tables exist in the database")
             st.stop()
+            
+        # Add event listener to prevent DELETE/TRUNCATE operations
+        @event.listens_for(engine, 'before_execute')
+        def prevent_destructive_operations(conn, clauseelement, multiparams, params):
+            if isinstance(clauseelement, str):
+                query = clauseelement.upper()
+                if 'DELETE' in query or 'TRUNCATE' in query:
+                    raise Exception("DELETE and TRUNCATE operations are not permitted")
             
         return SQLDatabase(
             engine,
@@ -100,6 +110,8 @@ def configure_db(db_uri, pg_host=None, pg_user=None, pg_password=None, pg_db=Non
             sample_rows_in_table_info=1,
             view_support=True
         )
+
+
 
 
 
@@ -157,6 +169,15 @@ elif db_uri == MYSQL:
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 
 # Create SQL Agent with strict table access
+def validate_query(query: str) -> bool:
+    """Validate if query contains prohibited operations"""
+    if not query:
+        return False
+    # Convert to uppercase for case-insensitive check
+    query_upper = query.upper()
+    prohibited_ops = ["DELETE", "TRUNCATE"]
+    return not any(op in query_upper for op in prohibited_ops)
+
 def validate_table_access(table_name: str) -> bool:
     """Validate if table is in the approved list"""
     if not table_name:
@@ -166,12 +187,20 @@ def validate_table_access(table_name: str) -> bool:
     return table_name.lower() in [t.lower() for t in existing_tables]
 
 
+
+def safe_agent_run(query: str, *args, **kwargs):
+    """Wrapper function to validate queries before execution"""
+    if not validate_query(query):
+        return "Access denied. DELETE and TRUNCATE operations are not permitted."
+    return agent.run(query, *args, **kwargs)
+
 agent = create_sql_agent(
     llm=llm,
     toolkit=toolkit,
     verbose=True,
     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     handle_parsing_errors=True,
+
     extra_prompt_messages=[
         "STRICT RULES: You can ONLY access the following tables: users_vw, surveys_vw, survey_winners, survey_fillers, filler_criterias.",
         "Before any query execution or even thinking about a query, verify it only involves the approved tables.",
@@ -180,8 +209,8 @@ agent = create_sql_agent(
         "'Access denied. I can only work with the specified tables.'",
         "Do not generate any SQL queries or access any database tables without first validating against the approved list.",
         "If you are unsure about table access, respond with 'Access denied' rather than attempting to proceed.",
-        "Under no circumstances should any SQL query include a DELETE action.",
-        "If a DELETE operation is requested or detected, immediately respond with:'Access denied. Delete operations are not permitted.'",
+        "Under no circumstances should any SQL query include a DELETE or TRUNCATE action.",
+        "If a DELETE or TRUNCATE operation is requested or detected, immediately respond with:'Access denied. DELETE and TRUNCATE operations are not permitted.'",
         "Generate SQL queries only after validating the table access and ensuring the query is safe and compliant.",
         "If a query is invalid or unsafe, respond with 'Invalid query' and do not proceed further.",
         "Make output are scannable and easy to understand for the user.",
@@ -201,7 +230,7 @@ for msg in st.session_state.messages:
 
 # User query input with table restriction notice
 user_query = st.chat_input(
-    placeholder="Ask about your data"
+    placeholder="Ask about the readiness table"
 )
 
 if user_query:
@@ -210,6 +239,7 @@ if user_query:
 
     with st.chat_message("assistant"):
         st_cb = StreamlitCallbackHandler(st.container())
-        response = agent.run(user_query, callbacks=[st_cb])
+        response = safe_agent_run(user_query, callbacks=[st_cb])
+
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.write(response)
