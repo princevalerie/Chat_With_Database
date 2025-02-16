@@ -23,7 +23,7 @@ Aplikasi ini memungkinkan pengguna untuk berinteraksi dengan berbagai jenis data
 
    ```bash
    git clone https://github.com/princevalerie/Chat_With_Database.git
-   cd repository
+   cd Chat_With_Database
    ```
 
 2. **Buat dan aktifkan lingkungan virtual**:
