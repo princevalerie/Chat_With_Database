@@ -1,6 +1,6 @@
 Berikut adalah contoh `README.md` yang dapat Anda tambahkan ke repositori GitHub Anda untuk memudahkan programmer lain memahami dan menggunakan aplikasi Streamlit yang Anda kembangkan:
 
-```markdown
+
 # Chat dengan Database Anda
 
 Aplikasi ini memungkinkan pengguna untuk berinteraksi dengan berbagai jenis database (SQLite, PostgreSQL, MySQL) melalui antarmuka web yang intuitif menggunakan Streamlit. Dengan integrasi model bahasa besar (LLM) dari Groq, pengguna dapat mengajukan pertanyaan dalam bahasa alami dan mendapatkan jawaban langsung dari database.
