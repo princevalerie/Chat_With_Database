@@ -22,7 +22,7 @@ Aplikasi ini memungkinkan pengguna untuk berinteraksi dengan berbagai jenis data
 1. **Kloning repositori ini**:
 
    ```bash
-   git clone https://github.com/username/repository.git
+   git clone https://github.com/princevalerie/Chat_With_Database.git
    cd repository
    ```
 
