@@ -205,8 +205,8 @@ agent = create_sql_agent(
         "STRICT RULES: You can ONLY access the following tables: users_vw, surveys_vw, survey_winners, survey_fillers, filler_criterias.",
         "Before any query execution or even thinking about a query, verify it only involves the approved tables.",
         "If a query requires accessing other tables, respond immediately with:",
-        "If you have found the right answer, just give the output and stop the thinking process."
         "'Access denied. I can only work with the specified tables.'",
+        "If you have found the right answer, just give the output and stop the thinking process."
         "Do not generate any SQL queries or access any database tables without first validating against the approved list.",
         "If you are unsure about table access, respond with 'Access denied' rather than attempting to proceed.",
         "Under no circumstances should any SQL query include a DELETE or TRUNCATE action.",
