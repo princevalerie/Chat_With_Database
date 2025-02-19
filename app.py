@@ -62,7 +62,7 @@ if not api_key:
 llm = ChatGroq(groq_api_key=api_key, model_name="Llama3-8b-8192", streaming=True)
 
 # Define tables to check globally
-tables_to_check = ['users_vw', 'surveys_vw', 'survey_winners', 'survey_fillers', 'filler_criterias']
+tables_to_check = ['users_vw', 'surveys_vw', 'survey_winners', 'survey_fillers', 'filler_criterias','disbursed_detail_vw']
 
 # Function to configure database connection
 @st.cache_resource(ttl="2h", show_spinner=False)
