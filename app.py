@@ -202,7 +202,7 @@ agent = create_sql_agent(
     handle_parsing_errors=True,
 
     extra_prompt_messages=[
-        "STRICT RULES: You can ONLY access the following tables: users_vw, surveys_vw, survey_winners, survey_fillers, filler_criterias.",
+        "STRICT RULES: You can ONLY access the following tables: users_vw, surveys_vw, survey_winners, survey_fillers, filler_criterias,disbursed_detail_vw",
         "Before any query execution or even thinking about a query, verify it only involves the approved tables.",
         "If a query requires accessing other tables, respond immediately with:",
         "'Access denied. I can only work with the specified tables.'",
